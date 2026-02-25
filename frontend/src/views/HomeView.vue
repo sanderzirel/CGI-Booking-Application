@@ -4,10 +4,10 @@
     </div>
     <div class="container">
         <div class="filters">
-            <p>Will add filters here later</p>
+            <dropdownMenu @update="selectedLocation = $event"/>
         </div>
-        <div class="hallPlan">
-            <div v-for="table in tablesInside" :key="table.id" :class="['table', tableSize(table.size)]">
+        <div class="restaurantPlan">
+            <div v-for="table in floorPlan" :key="table.id" :class="'table'">
                 {{table.size + " persons"}}
             </div>
         </div>
@@ -16,14 +16,9 @@
 </template>
 
 <script setup>
-    import {ref} from "vue";
-
-    function tableSize(size) {
-        if (size <= 2) return "small";
-        if (size <= 4) return "medium";
-        else return "big"
-    }
-
+    import {ref, computed} from "vue";
+    import dropdownMenu from "../components/dropdown-menu.vue";
+    
     //Tables for restaurant
     const tablesInside = ref([
         {id: 1, size: 2},
@@ -50,6 +45,18 @@
         {id: 2, size: 15}
     ])
 
+    const selectedLocation = ref("Inside");
+
+    const tablesSelection = {
+        Inside: tablesInside,
+        Outside: tablesOutside,
+        Private: tablesPrivate
+    };
+
+    const floorPlan = computed(() => 
+        tablesSelection[selectedLocation.value].value
+    );
+
 </script>
 
 <style>
@@ -71,7 +78,7 @@
   text-align: center;
 }
 
-.hallPlan {
+.restaurantPlan {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
@@ -85,13 +92,16 @@
   border-radius: 8px;
   font-weight: bold;
   background-color: white;
+  width: 100px;
 
   border: 2px solid #222;
   box-sizing: border-box;
   background-color: #388087;
 }
 
-.table.small { width: 70px; }
-.table.medium { width: 90px; }
-.table.large { width: 120px; }
+.filters {
+    display: flex;
+    justify-content: center;
+}
+
 </style>
