@@ -3,12 +3,24 @@
         <h3>Welcome to restaurant PastaWorld!</h3>
     </div>
     <div class="container">
-        <div class="filters">
-            <dropdownMenu @update="selectedLocation = $event"/>
-        </div>
         <div class="restaurantPlan">
             <div v-for="table in floorPlan" :key="table.id" :class="'table'">
                 {{table.size + " persons"}}
+            </div>
+        </div>
+        <div class="filters">
+            <dropdownMenu @update="selectedLocation = $event"/>
+            <div class="people-count">
+                <p>People:</p>
+                <input type="number" v-model="peopleCount" min="0" max="20" @input="peopleLimit"/>
+            </div>
+            <div class="date-picker">
+                <p>Date:</p>
+                <input type="date" v-model="selectedDate" :min="today"/>
+            </div>
+            <div class="time-picker">
+                <p>Time:</p>
+                <input type="time" v-model="selectedTime" min="12:00" max="22:00" step="900"/>
             </div>
         </div>
 
@@ -57,6 +69,21 @@
         tablesSelection[selectedLocation.value].value
     );
 
+    const peopleCount = ref(0);
+
+    function peopleLimit() {
+        if (peopleCount.value === "" || peopleCount.value === null) return;
+        if (peopleCount.value < 0) {
+            peopleCount.value = 0;
+        } else if (peopleCount.value > 20) {
+            peopleCount.value = 20;
+        }
+    }
+
+    const today = new Date().toISOString().substr(0, 10);
+    const selectedDate = ref(today);
+    const selectedTime = ref("");
+
 </script>
 
 <style>
@@ -68,6 +95,14 @@
     font-size: 20px;
     display: flex;
     background-color: #388087;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 80% 1fr;
+    padding: 20px;
+    margin-top: 20px;
+    gap: 10px;
 }
 
 #app {
@@ -82,6 +117,9 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
+    padding: 10px;
+    background-color: #ccc;
+    border-radius: 10px;
 }
 
 .table {
@@ -101,7 +139,25 @@
 
 .filters {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    align-items: center; 
+    background: #388087;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.people-count {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-picker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 </style>
