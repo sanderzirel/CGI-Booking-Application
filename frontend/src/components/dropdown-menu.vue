@@ -15,12 +15,21 @@
 
 <script setup>
 import { ref } from "vue"
-
+const props = defineProps({
+  items: {
+    type: Array,
+    default: () => []
+  },
+  defaultValue: {
+    type: String,
+    default: ""
+  }
+})
 const isOpen = ref(false)
 
-const options = ["Inside", "Outside", "Private"]
+const options = props.items
 
-const selected = ref("Inside")
+const selected = ref(props.defaultValue)
 
 const emit = defineEmits(["update"])
 
@@ -38,7 +47,7 @@ function select(option) {
 <style>
 .dropdown {
   position: relative;
-  width: 200px;
+  width: 150px;
 }
 
 .dropdown-btn {

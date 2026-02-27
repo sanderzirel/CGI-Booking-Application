@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="filters">
-            <dropdownMenu @update="selectedLocation = $event"/>
+            <dropdownMenu :items="locations" :defaultValue="locations[0]" @update="selectedLocation = $event"/>
             <div class="people-count">
                 <p>People:</p>
                 <input type="number" v-model="peopleCount" min="0" max="20" @input="peopleLimit"/>
@@ -20,7 +20,13 @@
             </div>
             <div class="time-picker">
                 <p>Time:</p>
-                <input type="time" v-model="selectedTime" min="12:00" max="22:00" step="900"/>
+                <dropdownMenu :items="timeSlots" :defaultValue="timeSlots[0]" @update="selectedTime = $event"/>
+            </div>
+            <div class="preferences">
+                <p>Preferences:</p>
+                <button>Couch area</button>
+                <button>Window seat</button>
+                <button>Quiet area</button>
             </div>
         </div>
 
@@ -34,6 +40,8 @@
     const tablesInside = ref([]);
     const tablesOutside = ref([]);
     const tablesPrivate = ref([]);
+    const timeSlots = ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"];
+    const locations = ["Inside", "Outside", "Private"];
     
     const selectedLocation = ref("Inside");
 
@@ -154,6 +162,18 @@
 
 .table.reserved {
   background-color: rgb(95, 91, 91);
+}
+
+.time-picker {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+.preferences.buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
 }
 
 </style>
