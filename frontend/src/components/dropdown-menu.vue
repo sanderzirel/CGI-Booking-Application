@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 const props = defineProps({
   items: {
     type: Array,
@@ -33,6 +33,7 @@ const selected = ref(props.defaultValue)
 
 const emit = defineEmits(["update"])
 
+
 function toggle() {
   isOpen.value = !isOpen.value
 }
@@ -42,12 +43,20 @@ function select(option) {
   isOpen.value = false
   emit("update", option)
 }
+
+onMounted(() => {
+  document.addEventListener("click", (event) => {
+    if (isOpen.value && !event.target.closest(".dropdown")) {
+      isOpen.value = false
+    }
+  })
+})
 </script>
 
 <style>
 .dropdown {
   position: relative;
-  width: 150px;
+  width: 80%;
 }
 
 .dropdown-btn {
@@ -64,6 +73,9 @@ function select(option) {
   margin-top: 5px;
   border-radius: 6px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  max-height: 150px;
+  overflow-y: auto;
+  min-width: 100px;
 }
 
 .dropdown-item {

@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,42 @@ import com.example.backend.repository.TableReservationRepository;
 @RestController
 @RequestMapping("/api")
 public class TableController {
+    @GetMapping("/tables/suggest")
+    public List<Map<String, Object>> suggestTables(
+        @RequestParam String date,
+        @RequestParam String time,
+        @RequestParam int peopleCount,
+        @RequestParam(required = false) String preference) {
+        
+        List<Map<String, Object>> allTables = getTables(date, time);
+        return allTables.stream()
+        .filter(table -> !((Boolean) table.get("reserved")))
+        .filter(table -> {
+            Integer size = (Integer) table.get("size");
+            return size >= peopleCount; 
+        })
+        .filter(table -> {
+            if (preference == null || preference.isEmpty()) return true;
+            String zone = (String) table.get("zone");
+            return matchesPreference(zone, preference);
+        })
+        .sorted((t1, t2) -> {
+            Integer size1 = (Integer) t1.get("size");
+            Integer size2 = (Integer) t2.get("size");
+            return size1.compareTo(size2);
+        })
+        .collect(Collectors.toList());
+    }
+
+    private boolean matchesPreference(String zone, String preference) {
+        return switch(preference.toLowerCase()) {
+            case "couch area", "quiet area" -> zone.equals("inside") || zone.equals("private");
+            case "window seat" -> zone.equals("outside");
+            default -> true;
+        };
+    }
+
+
 
     @Autowired
     private TableReservationRepository reservationRepository;

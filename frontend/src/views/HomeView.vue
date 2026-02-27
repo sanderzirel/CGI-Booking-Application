@@ -4,7 +4,7 @@
     </div>
     <div class="container">
         <div class="restaurantPlan">
-            <div v-for="table in floorPlan" :key="table.id"  :class="['table', table.reserved ? 'reserved' : '']">
+            <div v-for="table in floorPlan" :key="table.id"  :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
                 {{table.size + " persons"}}
             </div>
         </div>
@@ -24,9 +24,21 @@
             </div>
             <div class="preferences">
                 <p>Preferences:</p>
-                <button>Couch area</button>
-                <button>Window seat</button>
-                <button>Quiet area</button>
+                <button 
+                    :class="{ active: selectedPreference === 'Couch area' }"
+                    @click="selectedPreference = selectedPreference === 'Couch area' ? '' : 'Couch area'">
+                    Couch area
+                </button>
+                <button 
+                    :class="{ active: selectedPreference === 'Window seat' }"
+                    @click="selectedPreference = selectedPreference === 'Window seat' ? '' : 'Window seat'">
+                    Window seat
+                </button>
+                <button 
+                    :class="{ active: selectedPreference === 'Quiet area' }"
+                    @click="selectedPreference = selectedPreference === 'Quiet area' ? '' : 'Quiet area'">
+                    Quiet area
+                </button>
             </div>
         </div>
 
@@ -69,6 +81,12 @@
     const today = new Date().toISOString().substr(0, 10);
     const selectedDate = ref(today);
     const selectedTime = ref("");
+    const selectedPreference = ref("");
+    const suggestedTableIds = ref([]);
+
+    function isSuggested(table) {
+        return suggestedTableIds.value.includes(table.id);
+    }
 
     function fetchTables() {
         fetch(`http://localhost:8080/api/tables?date=${selectedDate.value}&time=${selectedTime.value}`)
@@ -81,9 +99,37 @@
             })
             .catch(error => console.error("Error fetching tables:", error));
     };
+
+    function fetchSuggestions() {
+        const params = new URLSearchParams({
+            date: selectedDate.value,
+            time: selectedTime.value,
+            peopleCount: peopleCount.value || 1
+        });
+
+        if (selectedPreference.value) {
+            params.append("preference", selectedPreference.value);
+        }
+
+        fetch(`http://localhost:8080/api/tables/suggest?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("Suggested tables:", data);
+                suggestedTableIds.value = data.map(t => t.id);
+            })
+            .catch(error => console.error("Error fetching suggestions:", error));
+    }
     
     onMounted(fetchTables);
     watch([selectedDate, selectedTime], fetchTables);
+
+    watch([peopleCount, selectedPreference], () => {
+        if (peopleCount.value > 0 || selectedPreference.value) {
+            fetchSuggestions();
+        } else {
+            suggestedTableIds.value = [];
+        }
+    });
 </script>
 
 <style>
@@ -176,4 +222,17 @@
     gap: 10px;
 }
 
+.table.suggested {
+  box-shadow: 0 0 0 4px #4CAF50;
+  border-color: #4CAF50;
+}
+.preferences button.active {
+    background-color: white;
+    color: #388087;
+    font-weight: bold;
+}
+
+.preferences button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
 </style>
