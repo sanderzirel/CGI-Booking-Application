@@ -4,7 +4,7 @@
     </div>
     <div class="container">
         <div class="restaurantPlan">
-            <div v-for="table in floorPlan" :key="table.id" :class="'table'">
+            <div v-for="table in floorPlan" :key="table.id"  :class="['table', table.reserved ? 'reserved' : '']">
                 {{table.size + " persons"}}
             </div>
         </div>
@@ -28,35 +28,13 @@
 </template>
 
 <script setup>
-    import {ref, computed} from "vue";
+    import {ref, computed, onMounted, watch} from "vue";
     import dropdownMenu from "../components/dropdown-menu.vue";
-    
-    //Tables for restaurant
-    const tablesInside = ref([
-        {id: 1, size: 2},
-        {id: 2, size: 2},
-        {id: 3, size: 4},
-        {id: 4, size: 4},
-        {id: 5, size: 4},
-        {id: 6, size: 4},
-        {id: 7, size: 6},
-        {id: 8, size: 6},
-        {id: 9, size: 2},
-        {id: 10, size: 2},
-    ]);
-     const tablesOutside = ref([
-        {id: 1, size: 2},
-        {id: 2, size: 2},
-        {id: 3, size: 4},
-        {id: 4, size: 4},
-        {id: 5, size: 4},
-        {id: 6, size: 6},
-    ]);
-     const tablesPrivate = ref([
-        {id: 1, size: 20},
-        {id: 2, size: 15}
-    ])
 
+    const tablesInside = ref([]);
+    const tablesOutside = ref([]);
+    const tablesPrivate = ref([]);
+    
     const selectedLocation = ref("Inside");
 
     const tablesSelection = {
@@ -84,6 +62,20 @@
     const selectedDate = ref(today);
     const selectedTime = ref("");
 
+    function fetchTables() {
+        fetch(`http://localhost:8080/api/tables?date=${selectedDate.value}&time=${selectedTime.value}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("Fetched tables:", data);
+                tablesInside.value = data.filter(t => t.zone === "inside")
+                tablesOutside.value = data.filter(t => t.zone === "outside")
+                tablesPrivate.value = data.filter(t => t.zone === "private")
+            })
+            .catch(error => console.error("Error fetching tables:", error));
+    };
+    
+    onMounted(fetchTables);
+    watch([selectedDate, selectedTime], fetchTables);
 </script>
 
 <style>
@@ -158,6 +150,10 @@
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.table.reserved {
+  background-color: rgb(95, 91, 91);
 }
 
 </style>
