@@ -4,6 +4,7 @@
     </div>
     <div class="container">
             <div class="restaurantPlan">
+
                 <div class="inside-section">
                     <p class="section-name" :class="{ active: selectedLocation === 'Inside' }">Inside</p>
                     <div class="tables-grid">
@@ -198,17 +199,70 @@
 
 .restaurantPlan {
     display: grid;
+    flex: 1;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
     gap: 10px;
     padding: 10px;
     background-color: #ccc;
     border-radius: 10px;
+    position: relative;
+}
+
+.restaurantPlan::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 35%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 70%;
+    background-color: #0277bd;
+}
+
+.restaurantPlan::before {
+    content: "";
+    position: absolute;
+    left: 20%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 4px;
+    background-color: #0277bd;
 }
 
 .inside-section {
     grid-column: 1;
     grid-row: 1;
+}
+
+.inside-section .tables-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 20px;
+    position: relative;
+}
+
+.inside-section .tables-grid::before {
+    content: "";
+    position: absolute;
+    left: 32%;
+    top: 25%;
+    height: 200px;
+    width: 2px;
+    background-color: black;
+    transform: translateY(-40%);
+}
+
+.inside-section .tables-grid::after {
+    content: "";
+    position: absolute;
+    left: 66%;
+    top: 25%;
+    height: 200px;
+    width: 2px;
+    background-color: black;
+    transform: translateY(-40%);
 }
 
 .outside-section {
@@ -220,12 +274,16 @@
     grid-column: 1;
     grid-row: 2;
 }
+.private-section .tables-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
 
 .tables-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
+    gap: 40px 20px;
 }
+
 
 .table {
   display: flex;
@@ -294,4 +352,5 @@
 .preferences button:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
+
 </style>

@@ -60,13 +60,15 @@ public class TableController {
         Map.of("id", 3, "size", 4, "zone", "inside"),
         Map.of("id", 4, "size", 4, "zone", "inside"),
         Map.of("id", 5, "size", 6, "zone", "inside"),
-        Map.of("id", 6, "size", 2, "zone", "outside"),
-        Map.of("id", 7, "size", 4, "zone", "outside"),
+        Map.of("id", 6, "size", 2, "zone", "inside"),
+        Map.of("id", 7, "size", 4, "zone", "inside"),
         Map.of("id", 8, "size", 2, "zone", "outside"),
         Map.of("id", 9, "size", 4, "zone", "outside"),
-        Map.of("id", 10, "size", 6, "zone", "outside"),
-        Map.of("id", 11, "size", 20, "zone", "private"),
-        Map.of("id", 12, "size", 15, "zone", "private")
+        Map.of("id", 10, "size", 2, "zone", "outside"),
+        Map.of("id", 11, "size", 4, "zone", "outside"),
+        Map.of("id", 12, "size", 6, "zone", "outside"),
+        Map.of("id", 13, "size", 20, "zone", "private"),
+        Map.of("id", 14, "size", 15, "zone", "private")
     );
 
     @GetMapping("/tables")
