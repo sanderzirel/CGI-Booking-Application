@@ -3,11 +3,35 @@
         <h3>Welcome to restaurant PastaWorld!</h3>
     </div>
     <div class="container">
-        <div class="restaurantPlan">
-            <div v-for="table in floorPlan" :key="table.id"  :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
-                {{table.size + " persons"}}
+            <div class="restaurantPlan">
+                <div class="inside-section">
+                    <p class="section-name" :class="{ active: selectedLocation === 'Inside' }">Inside</p>
+                    <div class="tables-grid">
+                        <div v-for="table in tablesInside" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
+                            {{table.size + " persons"}}
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="outside-section">
+                    <p class="section-name" :class="{ active: selectedLocation === 'Outside' }">Outside</p>
+                    <div class="tables-grid">
+                        <div v-for="table in tablesOutside" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
+                            {{table.size + " persons"}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="private-section">
+                    <p class="section-name" :class="{ active: selectedLocation === 'Private' }">Private</p>
+                    <div class="tables-grid">
+                        <div v-for="table in tablesPrivate" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
+                            {{table.size + " persons"}}
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
         <div class="filters">
             <dropdownMenu :items="locations" :defaultValue="locations[0]" @update="selectedLocation = $event"/>
             <div class="people-count">
@@ -77,6 +101,8 @@
             peopleCount.value = 20;
         }
     }
+
+   
 
     const today = new Date().toISOString().substr(0, 10);
     const selectedDate = ref(today);
@@ -149,6 +175,7 @@
     padding: 20px;
     margin-top: 20px;
     gap: 10px;
+    min-height: 600px;
 }
 
 #app {
@@ -159,13 +186,45 @@
   text-align: center;
 }
 
+.section-name.active {
+    color: #388087;
+}
+
+.section-name {
+    display: flex;
+    justify-content: flex-start;
+    font-weight: bold;
+}
+
 .restaurantPlan {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
     padding: 10px;
     background-color: #ccc;
     border-radius: 10px;
+}
+
+.inside-section {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.outside-section {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.private-section {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.tables-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
 }
 
 .table {
