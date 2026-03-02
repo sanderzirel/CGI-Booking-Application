@@ -11,4 +11,5 @@ public interface TableReservationRepository extends JpaRepository<TableReservati
     List<TableReservation> findByDateAndTime(String date, String time);
     boolean existsByDateAndTime(String date, String time);
     void deleteByDateAndTime(String date, String time);
+    boolean existsByTableIdAndDateAndTime(Integer tableId, String date, String time);
 }

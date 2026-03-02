@@ -9,7 +9,7 @@
                     <p class="section-name" :class="{ active: selectedLocation === 'Inside' }">Inside</p>
                     <div class="tables-grid">
                         <div v-for="table in tablesInside" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
-                            {{table.size + " persons"}}
+                            {{table.size + " people"}}
                         </div>
                     </div>
                 </div>
@@ -19,7 +19,7 @@
                     <p class="section-name" :class="{ active: selectedLocation === 'Outside' }">Outside</p>
                     <div class="tables-grid">
                         <div v-for="table in tablesOutside" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
-                            {{table.size + " persons"}}
+                            {{table.size + " people"}}
                         </div>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                     <p class="section-name" :class="{ active: selectedLocation === 'Private' }">Private</p>
                     <div class="tables-grid">
                         <div v-for="table in tablesPrivate" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
-                            {{table.size + " persons"}}
+                            {{table.size + " people"}}
                         </div>
                     </div>
                 </div>
@@ -131,7 +131,8 @@
         const params = new URLSearchParams({
             date: selectedDate.value,
             time: selectedTime.value,
-            peopleCount: peopleCount.value || 1
+            peopleCount: peopleCount.value || 1,
+            location: selectedLocation.value
         });
 
         if (selectedPreference.value) {
@@ -156,6 +157,11 @@
         } else {
             suggestedTableIds.value = [];
         }
+    });
+
+    watch(selectedLocation, () => {
+        selectedPreference.value = "";
+        suggestedTableIds.value = [];
     });
 </script>
 

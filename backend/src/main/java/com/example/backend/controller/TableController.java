@@ -19,32 +19,59 @@ public class TableController {
         @RequestParam String date,
         @RequestParam String time,
         @RequestParam int peopleCount,
+        @RequestParam String location,
         @RequestParam(required = false) String preference) {
         
-        List<Map<String, Object>> allTables = getTables(date, time);
-        return allTables.stream()
-        .filter(table -> !((Boolean) table.get("reserved")))
-        .filter(table -> {
-            Integer size = (Integer) table.get("size");
-            return size >= peopleCount; 
-        })
-        .filter(table -> {
-            if (preference == null || preference.isEmpty()) return true;
-            String zone = (String) table.get("zone");
-            return matchesPreference(zone, preference);
-        })
-        .sorted((t1, t2) -> {
-            Integer size1 = (Integer) t1.get("size");
-            Integer size2 = (Integer) t2.get("size");
-            return size1.compareTo(size2);
-        })
-        .collect(Collectors.toList());
+        List<Map<String, Object>> tables = getTables(date, time);
+
+        List<Map<String, Object>> availableTables = tables.stream()
+            .filter(table -> table.get("zone").equals(location.toLowerCase()))
+            .filter(table -> {
+                Integer size = (Integer) table.get("size");
+                return size >= peopleCount; 
+            })
+            .filter(table -> !(Boolean) table.get("reserved"))
+            .sorted((t1, t2) -> {
+                Integer size1 = (Integer) t1.get("size");
+                Integer size2 = (Integer) t2.get("size");
+                return size1.compareTo(size2);
+            })
+            .collect(Collectors.toList());
+
+        Integer smallestFitSize = availableTables.stream()
+            .map(table -> (Integer) table.get("size"))
+            .min(Integer::compareTo)
+            .orElse(peopleCount);
+
+        List<Map<String, Object>> smallestFitTables = availableTables.stream()
+            .filter(table -> table.get("size").equals(smallestFitSize))
+            .collect(Collectors.toList());
+
+        if (preference ==  null || preference.isEmpty()) {
+            return smallestFitTables;
+        }
+
+        
+        List<Map<String, Object>> preferredTables = smallestFitTables.stream()
+            .filter(table -> {
+                List<String> features = (List<String>) table.get("features");
+                return matchesPreference(preference, features);
+            })
+            .collect(Collectors.toList());
+
+        
+        if (!preferredTables.isEmpty()) {
+            return preferredTables;
+        }
+
+        return smallestFitTables;
     }
 
-    private boolean matchesPreference(String zone, String preference) {
+    private boolean matchesPreference(String preference, List<String> features) {
         return switch(preference.toLowerCase()) {
-            case "couch area", "quiet area" -> zone.equals("inside") || zone.equals("private");
-            case "window seat" -> zone.equals("outside");
+            case "couch area" -> features.contains("couch");
+            case "window seat" -> features.contains("window");
+            case "quiet area" -> features.contains("quiet");
             default -> true;
         };
     }
@@ -55,20 +82,20 @@ public class TableController {
     private TableReservationRepository reservationRepository;
 
     private static final List<Map<String, Object>> TABLE_DEFINITIONS = List.of(
-        Map.of("id", 1, "size", 2, "zone", "inside"),
-        Map.of("id", 2, "size", 2, "zone", "inside"),
-        Map.of("id", 3, "size", 4, "zone", "inside"),
-        Map.of("id", 4, "size", 4, "zone", "inside"),
-        Map.of("id", 5, "size", 6, "zone", "inside"),
-        Map.of("id", 6, "size", 2, "zone", "inside"),
-        Map.of("id", 7, "size", 4, "zone", "inside"),
-        Map.of("id", 8, "size", 2, "zone", "outside"),
-        Map.of("id", 9, "size", 4, "zone", "outside"),
-        Map.of("id", 10, "size", 2, "zone", "outside"),
-        Map.of("id", 11, "size", 4, "zone", "outside"),
-        Map.of("id", 12, "size", 6, "zone", "outside"),
-        Map.of("id", 13, "size", 20, "zone", "private"),
-        Map.of("id", 14, "size", 15, "zone", "private")
+        Map.of("id", 1, "size", 2, "zone", "inside", "features", List.of("window")),
+        Map.of("id", 2, "size", 2, "zone", "inside", "features", List.of("quiet", "couch")),
+        Map.of("id", 3, "size", 4, "zone", "inside", "features", List.of("quiet", "couch")),
+        Map.of("id", 4, "size", 4, "zone", "inside", "features", List.of("window")),
+        Map.of("id", 5, "size", 6, "zone", "inside", "features", List.of("quiet")),
+        Map.of("id", 6, "size", 2, "zone", "inside", "features", List.of("quiet")),
+        Map.of("id", 7, "size", 4, "zone", "inside", "features", List.of("window")),
+        Map.of("id", 8, "size", 2, "zone", "outside", "features", List.of("couch")),
+        Map.of("id", 9, "size", 4, "zone", "outside", "features", List.of("couch")),
+        Map.of("id", 10, "size", 2, "zone", "outside", "features", List.of("")),
+        Map.of("id", 11, "size", 4, "zone", "outside", "features", List.of("")),
+        Map.of("id", 12, "size", 6, "zone", "outside", "features", List.of("couch")),
+        Map.of("id", 13, "size", 20, "zone", "private", "features", List.of("window")),
+        Map.of("id", 14, "size", 15, "zone", "private", "features", List.of("window"))
     );
 
     @GetMapping("/tables")
@@ -120,4 +147,5 @@ public class TableController {
         int hash = (tableId + "_" + date + "_" + time).hashCode();
         return Math.abs(hash % 100) < 30;
     }
+
 }
