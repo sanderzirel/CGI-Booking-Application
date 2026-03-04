@@ -350,8 +350,8 @@
   height: 80px;
   border-radius: 8px;
   font-weight: bold;
-
   width: 100px;
+  user-select: none;
 
   border: 2px solid #222;
   box-sizing: border-box;
@@ -425,4 +425,17 @@
     background-color: rgba(255, 255, 255, 0.3);
 }
 
+.booking button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    cursor: pointer;
+}
+.booking button:hover {
+    background-color: #45a049;
+}
 </style>
