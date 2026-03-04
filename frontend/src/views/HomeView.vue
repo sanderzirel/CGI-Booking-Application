@@ -69,8 +69,8 @@
                 
             </div>
 
-            <div class="booking">
-                <button>Book Table</button>
+            <div class="booking" v-if="selectedTableId !== null">
+                <button @click="bookTable()">Book Table</button>
             </div>
 
         </div>
@@ -171,6 +171,31 @@
                 suggestedTableIds.value = data.map(t => t.id);
             })
             .catch(error => console.error("Error fetching suggestions:", error));
+    }
+
+    function bookTable() {
+        const reservationDetails = {
+            tableId: selectedTableId.value,
+            date: selectedDate.value,
+            time: selectedTime.value,
+        }
+        fetch(`http://localhost:8080/api/reservations`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(reservationDetails)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("Reservation successful!");
+                selectedTableId.value = null;
+                fetchTables();
+            } else {
+                alert("Failed to make reservation.");
+            }
+        })
+        .catch(error => console.error("Error booking table:", error));
     }
     
     onMounted(fetchTables);
