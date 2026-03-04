@@ -8,7 +8,7 @@
                 <div class="inside-section">
                     <p class="section-name" :class="{ active: selectedLocation === 'Inside' }">Inside</p>
                     <div class="tables-grid">
-                        <div v-for="table in tablesInside" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
+                        <div v-for="table in tablesInside" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '', isSelected(table) ? 'selected' : '']" @click="selectTable(table)">
                             {{table.size + " people"}}
                         </div>
                     </div>
@@ -18,7 +18,7 @@
                 <div class="outside-section">
                     <p class="section-name" :class="{ active: selectedLocation === 'Outside' }">Outside</p>
                     <div class="tables-grid">
-                        <div v-for="table in tablesOutside" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
+                        <div v-for="table in tablesOutside" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '', isSelected(table) ? 'selected' : '']" @click="selectTable(table)">
                             {{table.size + " people"}}
                         </div>
                     </div>
@@ -27,46 +27,53 @@
                 <div class="private-section">
                     <p class="section-name" :class="{ active: selectedLocation === 'Private' }">Private</p>
                     <div class="tables-grid">
-                        <div v-for="table in tablesPrivate" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '']">
+                        <div v-for="table in tablesPrivate" :key="table.id" :class="['table', table.reserved ? 'reserved' : '', isSuggested(table) ? 'suggested' : '', isSelected(table) ? 'selected' : '']" @click="selectTable(table)">
                             {{table.size + " people"}}
                         </div>
                     </div>
                 </div>
             </div>
-        <div class="filters">
-            <dropdownMenu :items="locations" :defaultValue="locations[0]" @update="selectedLocation = $event"/>
-            <div class="people-count">
-                <p>People:</p>
-                <input type="number" v-model="peopleCount" min="0" max="20" @input="peopleLimit"/>
+        <div class="containerbox">
+            <div class="filters">
+                <dropdownMenu :items="locations" :defaultValue="locations[0]" @update="selectedLocation = $event"/>
+                <div class="people-count">
+                    <p>People:</p>
+                    <input type="number" v-model="peopleCount" min="0" max="20" @input="peopleLimit"/>
+                </div>
+                <div class="date-picker">
+                    <p>Date:</p>
+                    <input type="date" v-model="selectedDate" :min="today"/>
+                </div>
+                <div class="time-picker">
+                    <p>Time:</p>
+                    <dropdownMenu :items="timeSlots" :defaultValue="timeSlots[0]" @update="selectedTime = $event"/>
+                </div>
+                <div class="preferences">
+                    <p>Preferences:</p>
+                    <button 
+                        :class="{ active: selectedPreference === 'Couch area' }"
+                        @click="selectedPreference = selectedPreference === 'Couch area' ? '' : 'Couch area'">
+                        Couch area
+                    </button>
+                    <button 
+                        :class="{ active: selectedPreference === 'Window seat' }"
+                        @click="selectedPreference = selectedPreference === 'Window seat' ? '' : 'Window seat'">
+                        Window seat
+                    </button>
+                    <button 
+                        :class="{ active: selectedPreference === 'Quiet area' }"
+                        @click="selectedPreference = selectedPreference === 'Quiet area' ? '' : 'Quiet area'">
+                        Quiet area
+                    </button>
+                </div>
+                
             </div>
-            <div class="date-picker">
-                <p>Date:</p>
-                <input type="date" v-model="selectedDate" :min="today"/>
-            </div>
-            <div class="time-picker">
-                <p>Time:</p>
-                <dropdownMenu :items="timeSlots" :defaultValue="timeSlots[0]" @update="selectedTime = $event"/>
-            </div>
-            <div class="preferences">
-                <p>Preferences:</p>
-                <button 
-                    :class="{ active: selectedPreference === 'Couch area' }"
-                    @click="selectedPreference = selectedPreference === 'Couch area' ? '' : 'Couch area'">
-                    Couch area
-                </button>
-                <button 
-                    :class="{ active: selectedPreference === 'Window seat' }"
-                    @click="selectedPreference = selectedPreference === 'Window seat' ? '' : 'Window seat'">
-                    Window seat
-                </button>
-                <button 
-                    :class="{ active: selectedPreference === 'Quiet area' }"
-                    @click="selectedPreference = selectedPreference === 'Quiet area' ? '' : 'Quiet area'">
-                    Quiet area
-                </button>
-            </div>
-        </div>
 
+            <div class="booking">
+                <button>Book Table</button>
+            </div>
+
+        </div>
     </div>
 </template>
 
@@ -110,9 +117,19 @@
     const selectedTime = ref("");
     const selectedPreference = ref("");
     const suggestedTableIds = ref([]);
-
+    const selectedTableId = ref(null);
+    
     function isSuggested(table) {
         return suggestedTableIds.value.includes(table.id);
+    }
+
+    function isSelected(table) {
+        return selectedTableId.value === table.id;
+    }
+
+    function selectTable(table) {
+        if(!isSuggested(table) || table.reserved) return;
+        selectedTableId.value = selectedTableId.value === table.id ? null : table.id;
     }
 
     function fetchTables() {
@@ -123,7 +140,15 @@
                 tablesInside.value = data.filter(t => t.zone === "inside")
                 tablesOutside.value = data.filter(t => t.zone === "outside")
                 tablesPrivate.value = data.filter(t => t.zone === "private")
+
+                if (peopleCount.value > 0 || selectedPreference.value) {
+                    fetchSuggestions();
+                } else {
+                    suggestedTableIds.value = [];
+                }
+                selectedTableId.value = null;
             })
+            
             .catch(error => console.error("Error fetching tables:", error));
     };
 
@@ -157,11 +182,14 @@
         } else {
             suggestedTableIds.value = [];
         }
+        selectedTableId.value = null;
     });
 
     watch(selectedLocation, () => {
         selectedPreference.value = "";
         suggestedTableIds.value = [];
+        selectedTableId.value = null;
+        fetchSuggestions();
     });
 </script>
 
@@ -177,8 +205,7 @@
 }
 
 .container {
-    display: grid;
-    grid-template-columns: 80% 1fr;
+    display: flex;
     padding: 20px;
     margin-top: 20px;
     gap: 10px;
@@ -298,7 +325,7 @@
   height: 80px;
   border-radius: 8px;
   font-weight: bold;
-  background-color: white;
+
   width: 100px;
 
   border: 2px solid #222;
@@ -306,6 +333,12 @@
   background-color: #388087;
 }
 
+.containerbox {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 300px;
+}
 .filters {
     display: flex;
     flex-direction: column;
@@ -316,6 +349,7 @@
     border-radius: 10px;
     height: fit-content;
 }
+
 
 .people-count {
     display: flex;
@@ -348,6 +382,13 @@
 .table.suggested {
   box-shadow: 0 0 0 4px #4CAF50;
   border-color: #4CAF50;
+  cursor: pointer;
+}
+
+.table.selected {
+    background-color: cornsilk;
+    border-color: #ff9800;
+    box-shadow: 0 0 0 4px #ff9800;
 }
 .preferences button.active {
     background-color: white;
