@@ -79,7 +79,7 @@
             </div>
 
             <div v-if="openBookingForm" class="bookingForm-overlay">
-                <div class="bookingForm">
+                <div v-if="!successfulBooking" class="bookingForm">
                     <h3>Complete your booking</h3>
                     <label>Name</label>
                     <input v-model="guestName" type="text" placeholder="Full name" />
@@ -90,6 +90,13 @@
                     <div class="bookingForm-buttons">
                         <button @click="bookTable()">Confirm</button>
                         <button @click="openBookingForm = false">Cancel</button>
+                    </div>
+                </div>
+                <div v-if="successfulBooking" class="thankYouMessage">
+                    <h2>Thank you for your reservation!</h2>
+                    <p>We look forward to welcoming you at PastaWorld.</p>
+                    <div class="bookingForm-buttons">
+                        <button @click="openBookingForm = false">Close</button>
                     </div>
                 </div>
             </div>
@@ -198,6 +205,7 @@
     const guestName = ref("");
     const guestEmail = ref("");
     const guestPhone = ref("");
+    const successfulBooking = ref(false);
 
     function bookTable() {
         if (!guestName.value || !guestEmail.value || !guestPhone.value) {
@@ -221,9 +229,9 @@
         })
         .then(response => {
             if (response.ok) {
-                alert("Reservation successful!");
+                //alert("Reservation successful!");
                 selectedTableId.value = null;
-                openBookingForm.value = false;
+                successfulBooking.value = true;
                 guestName.value = "";
                 guestEmail.value = "";
                 guestPhone.value = "";
@@ -542,7 +550,7 @@
     z-index: 100;
 }
 
-.bookingForm {
+.bookingForm, .thankYouMessage {
     background: #F8F3E1;
     border-radius: 10px;
     padding: 30px;
@@ -568,4 +576,5 @@
     gap: 10px;
     margin-top: 10px;
 }
+
 </style>
