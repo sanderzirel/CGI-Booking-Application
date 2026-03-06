@@ -35,7 +35,9 @@
             </div>
         <div class="containerbox">
             <div class="filters">
-                <dropdownMenu :items="locations" :defaultValue="locations[0]" @update="selectedLocation = $event"/>
+                <div class="filter-row">
+                    <dropdownMenu :items="locations" :defaultValue="locations[0]" @update="selectedLocation = $event"/>
+                </div>
                 <div class="people-count">
                     <p>People:</p>
                     <input type="number" v-model="peopleCount" min="0" max="20" @input="peopleLimit"/>
@@ -50,6 +52,8 @@
                 </div>
                 <div class="preferences">
                     <p>Preferences:</p>
+                </div>
+                <div class="preferences-buttons">
                     <button 
                         :class="{ active: selectedPreference === 'Couch area' }"
                         @click="selectedPreference = selectedPreference === 'Couch area' ? '' : 'Couch area'">
@@ -84,7 +88,8 @@
     const tablesInside = ref([]);
     const tablesOutside = ref([]);
     const tablesPrivate = ref([]);
-    const timeSlots = ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"];
+    const timeSlots = ["12:00", "12:30", "13:00", "13:30","14:00", "14:30", "15:00", "15:30", "16:00", "16:30", 
+    "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00"];
     const locations = ["Inside", "Outside", "Private"];
     
     const selectedLocation = ref("Inside");
@@ -226,7 +231,8 @@
     border-radius: 15px;
     font-size: 20px;
     display: flex;
-    background-color: #388087;
+    background-color: #41431B;
+    color: #F8F3E1;
 }
 
 .container {
@@ -246,7 +252,7 @@
 }
 
 .section-name.active {
-    color: #388087;
+    color: #45a049;
 }
 
 .section-name {
@@ -262,7 +268,7 @@
     grid-template-rows: auto auto;
     gap: 10px;
     padding: 10px;
-    background-color: #ccc;
+    background-color: #E3DBBB;
     border-radius: 10px;
     position: relative;
 }
@@ -351,11 +357,10 @@
   border-radius: 8px;
   font-weight: bold;
   width: 100px;
-  user-select: none;
 
   border: 2px solid #222;
   box-sizing: border-box;
-  background-color: #388087;
+  background-color: #F8F3E1;
 }
 
 .containerbox {
@@ -367,46 +372,89 @@
 .filters {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px;
-    align-items: center; 
-    background: #388087;
+    gap: 15px;
+    padding: 15px;
+    background: #41431B;
+    color: black;
     border-radius: 10px;
     height: fit-content;
 }
 
+.filters p {
+    color: #F8F3E1;
+    margin: 0;
+    white-space: nowrap;
+}
 
-.people-count {
+.filter-row {
+    display: flex;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+}
+
+.people-count,
+.date-picker,
+.time-picker {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    width: 100%;
     gap: 10px;
 }
 
-.date-picker {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.time-picker {
+    position: relative;
+    z-index: 1;
+}
+
+.people-count input,
+.date-picker input {
+    width: 120px;
+    flex: none;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    font-size: 13px;
+    height: 28px;
+}
+
+.time-picker .dropdown {
+    width: 120px;
+}
+
+.time-picker .dropdown-btn {
+    padding: 4px 8px;
+    font-size: 13px;
+    height: 28px;
+    box-sizing: border-box;
 }
 
 .table.reserved {
   background-color: rgb(95, 91, 91);
 }
 
-.time-picker {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
+.preferences {
+    width: 100%;
 }
-.preferences.buttons {
+
+.preferences-buttons {
     display: flex;
-    flex-direction: row;
-    gap: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+.preferences-buttons button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px;
+    box-sizing: border-box;
+    cursor: pointer;
 }
 
 .table.suggested {
-  box-shadow: 0 0 0 4px #4CAF50;
-  border-color: #4CAF50;
+  box-shadow: 0 0 0 4px #45a048;
+  border-color: #45a048;
   cursor: pointer;
 }
 
@@ -415,21 +463,21 @@
     border-color: #ff9800;
     box-shadow: 0 0 0 4px #ff9800;
 }
-.preferences button.active {
+.preferences-buttons button.active {
     background-color: white;
-    color: #388087;
+    color: #41431B;
     font-weight: bold;
 }
 
-.preferences button:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+.preferences-buttons button:hover {
+    background-color: #f2f2f2;
 }
 
 .booking button {
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
+    background-color: #ff9800;
+    color: cornsilk;
     border: none;
     border-radius: 5px;
     width: 100%;

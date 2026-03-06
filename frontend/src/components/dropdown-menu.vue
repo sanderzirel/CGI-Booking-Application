@@ -56,13 +56,14 @@ onMounted(() => {
 <style>
 .dropdown {
   position: relative;
-  width: 80%;
+  width: 100%;
 }
 
 .dropdown-btn {
   width: 100%;
   padding: 10px;
   cursor: pointer;
+  color: black;
 }
 
 .dropdown-menu {
@@ -81,6 +82,7 @@ onMounted(() => {
 .dropdown-item {
   padding: 10px;
   cursor: pointer;
+  color: black;
 }
 
 .dropdown-item:hover {
