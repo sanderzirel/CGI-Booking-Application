@@ -13,7 +13,8 @@
                         </div>
                     </div>
                 </div>
-
+                
+                <div class="divider"></div>
 
                 <div class="outside-section">
                     <p class="section-name" :class="{ active: selectedLocation === 'Outside' }">Outside</p>
@@ -327,6 +328,16 @@
     width: 2px;
     background-color: black;
     transform: translateY(-40%);
+}
+
+.divider {
+    position: absolute;
+    left: 49%;
+    top: 10%;
+    height: 200px;
+    width: 2px;
+    background-color: black;
+    
 }
 
 .outside-section {
