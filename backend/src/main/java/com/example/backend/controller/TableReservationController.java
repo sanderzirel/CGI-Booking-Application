@@ -36,6 +36,9 @@ public class TableReservationController {
             }
 
             reservation.setReserved(true);
+            reservation.setGuestName(request.getGuestName());
+            reservation.setGuestEmail(request.getGuestEmail());
+            reservation.setGuestPhone(request.getGuestPhone());
             reservationRepository.save(reservation);
             return ResponseEntity.ok(reservation);
 

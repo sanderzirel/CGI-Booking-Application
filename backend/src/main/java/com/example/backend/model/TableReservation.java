@@ -23,6 +23,15 @@ public class TableReservation {
     
     @Column(nullable = false)
     private Boolean reserved;
+
+    @Column(nullable = true)
+    private String guestName;
+
+    @Column(nullable = true)
+    private String guestEmail;
+
+    @Column(nullable = true)
+    private String guestPhone;
     
     public TableReservation() {}
     
@@ -71,5 +80,29 @@ public class TableReservation {
     
     public void setReserved(Boolean reserved) {
         this.reserved = reserved;
+    }
+
+    public String getGuestName() { 
+        return guestName; 
+    }
+
+    public void setGuestName(String guestName) { 
+        this.guestName = guestName; 
+    }
+
+    public String getGuestEmail() { 
+        return guestEmail; 
+    }
+
+    public void setGuestEmail(String guestEmail) { 
+        this.guestEmail = guestEmail; 
+    }
+
+    public String getGuestPhone() { 
+        return guestPhone; 
+    }
+    
+    public void setGuestPhone(String guestPhone) { 
+        this.guestPhone = guestPhone; 
     }
 }

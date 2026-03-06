@@ -75,9 +75,24 @@
             </div>
 
             <div class="booking" v-if="selectedTableId !== null">
-                <button @click="bookTable()">Book Table</button>
+                <button @click="openBookingForm = true">Book Table</button>
             </div>
 
+            <div v-if="openBookingForm" class="bookingForm-overlay">
+                <div class="bookingForm">
+                    <h3>Complete your booking</h3>
+                    <label>Name</label>
+                    <input v-model="guestName" type="text" placeholder="Full name" />
+                    <label>Email</label>
+                    <input v-model="guestEmail" type="email" placeholder="Email address" />
+                    <label>Phone</label>
+                    <input v-model="guestPhone" type="tel" placeholder="Phone number" />
+                    <div class="bookingForm-buttons">
+                        <button @click="bookTable()">Confirm</button>
+                        <button @click="openBookingForm = false">Cancel</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -179,11 +194,23 @@
             .catch(error => console.error("Error fetching suggestions:", error));
     }
 
+    const openBookingForm = ref(false);
+    const guestName = ref("");
+    const guestEmail = ref("");
+    const guestPhone = ref("");
+
     function bookTable() {
+        if (!guestName.value || !guestEmail.value || !guestPhone.value) {
+            alert("Please fill in all guest details.");
+            return;
+        }
         const reservationDetails = {
             tableId: selectedTableId.value,
             date: selectedDate.value,
             time: selectedTime.value,
+            guestName: guestName.value,
+            guestEmail: guestEmail.value,
+            guestPhone: guestPhone.value
         }
         fetch(`http://localhost:8080/api/reservations`, {
             method: "PUT",
@@ -196,6 +223,10 @@
             if (response.ok) {
                 alert("Reservation successful!");
                 selectedTableId.value = null;
+                openBookingForm.value = false;
+                guestName.value = "";
+                guestEmail.value = "";
+                guestPhone.value = "";
                 fetchTables();
             } else {
                 alert("Failed to make reservation.");
@@ -220,7 +251,9 @@
         selectedPreference.value = "";
         suggestedTableIds.value = [];
         selectedTableId.value = null;
-        fetchSuggestions();
+        if (peopleCount.value > 0) {
+            fetchSuggestions();
+        }
     });
 </script>
 
@@ -250,6 +283,7 @@
   display: flex;
   flex-direction: column;
   text-align: center;
+  min-width: max-content;
 }
 
 .section-name.active {
@@ -496,5 +530,42 @@
 }
 .booking button:hover {
     background-color: #45a049;
+}
+
+.bookingForm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.bookingForm {
+    background: #F8F3E1;
+    border-radius: 10px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 300px;
+}
+
+.bookingForm h3 {
+    margin: 0 0 10px 0;
+}
+
+.bookingForm input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.bookingForm-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
 }
 </style>
