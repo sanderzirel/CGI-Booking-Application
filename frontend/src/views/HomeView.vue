@@ -70,8 +70,16 @@
                         @click="selectedPreference = selectedPreference === 'Quiet area' ? '' : 'Quiet area'">
                         Quiet area
                     </button>
+                </div>    
+            </div>
+
+            <div v-if="showWarning" class="bookingForm-overlay">
+                <div class="bookingForm">
+                    <p>For private dining, we require a minimum of <strong>8 people</strong>. Please adjust your preferences.</p>
+                    <div class="bookingForm-buttons">
+                        <button @click="showWarning = false">OK</button>
+                    </div>
                 </div>
-                
             </div>
 
             <div class="booking" v-if="selectedTableId !== null">
@@ -169,7 +177,7 @@
                 tablesOutside.value = data.filter(t => t.zone === "outside")
                 tablesPrivate.value = data.filter(t => t.zone === "private")
 
-                if (peopleCount.value > 0 || selectedPreference.value) {
+                if ((peopleCount.value > 0 || selectedPreference.value) && !enoughPeople()) {
                     fetchSuggestions();
                 } else {
                     suggestedTableIds.value = [];
@@ -206,6 +214,7 @@
     const guestEmail = ref("");
     const guestPhone = ref("");
     const successfulBooking = ref(false);
+    const showWarning = ref(false);
 
     function bookTable() {
         if (!guestName.value || !guestEmail.value || !guestPhone.value) {
@@ -229,7 +238,6 @@
         })
         .then(response => {
             if (response.ok) {
-                //alert("Reservation successful!");
                 selectedTableId.value = null;
                 successfulBooking.value = true;
                 guestName.value = "";
@@ -242,12 +250,29 @@
         })
         .catch(error => console.error("Error booking table:", error));
     }
+
+    function warningCheck() {
+        if (enoughPeople()) {
+            showWarning.value = true;
+            suggestedTableIds.value = [];
+            selectedTableId.value = null;
+            return true;
+        }
+        return false;
+    }
+
+    function enoughPeople() {
+        return selectedLocation.value === "Private" && peopleCount.value > 0 && peopleCount.value < 8;
+    }
     
     onMounted(fetchTables);
     watch([selectedDate, selectedTime], fetchTables);
 
     watch([peopleCount, selectedPreference], () => {
-        if (peopleCount.value > 0 || selectedPreference.value) {
+        if (warningCheck()) return;
+
+        showWarning.value = false;
+        if (peopleCount.value > 0 || (selectedPreference.value && peopleCount.value > 0)) {
             fetchSuggestions();
         } else {
             suggestedTableIds.value = [];
@@ -259,6 +284,9 @@
         selectedPreference.value = "";
         suggestedTableIds.value = [];
         selectedTableId.value = null;
+        if (warningCheck()) return;
+
+        showWarning.value = false;
         if (peopleCount.value > 0) {
             fetchSuggestions();
         }
@@ -575,6 +603,10 @@
     display: flex;
     gap: 10px;
     margin-top: 10px;
+}
+
+.bookingForm p {
+    color: inherit;
 }
 
 </style>
