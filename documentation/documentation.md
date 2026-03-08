@@ -19,3 +19,5 @@ For the HomeView, creating the restaurant layout was a little tricky to figure o
 I estimate that I spent approximately 20–25 hours working on this project.
 
 I used AI to help me guide through problems where I didn't know how to start. I also used websites such as **Stack Overflow** to solve specific problems, for example when implementing a dropdown menu.
+
+Booking form doesn't check for input values right now. This can be implemented in the future.
