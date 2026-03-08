@@ -23,7 +23,7 @@ public class TableController {
         @RequestParam(required = false) String preference) {
         
         List<Map<String, Object>> tables = getTables(date, time);
-
+        // AI gave me the idea to use streams and explained how I should use it to make it easier to filter tables.
         List<Map<String, Object>> availableTables = tables.stream()
             .filter(table -> table.get("zone").equals(location.toLowerCase()))
             .filter(table -> {
@@ -81,6 +81,7 @@ public class TableController {
     @Autowired
     private TableReservationRepository reservationRepository;
 
+    //Creates database with tables
     private static final List<Map<String, Object>> TABLE_DEFINITIONS = List.of(
         Map.of("id", 1, "size", 2, "zone", "inside", "features", List.of("window")),
         Map.of("id", 2, "size", 2, "zone", "inside", "features", List.of("quiet", "couch")),
@@ -98,6 +99,7 @@ public class TableController {
         Map.of("id", 14, "size", 15, "zone", "private", "features", List.of("window"))
     );
 
+    //Gets the tables information and check if there are reservations for specific date and time, if not it generates them.
     @GetMapping("/tables")
     public List<Map<String, Object>> getTables(
         @RequestParam(required = false) String date,
@@ -133,6 +135,7 @@ public class TableController {
         return tables;
     }
 
+    //Randomly generates reservations for tables with a 30% change of being reserved (isTableReserved adds the randomness part).
     private void generateAndSaveReservations(String date, String time) {
         for (Map<String, Object> tableDef : TABLE_DEFINITIONS) {
             Integer tableId = (Integer) tableDef.get("id");

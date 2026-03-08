@@ -266,6 +266,8 @@
     }
     
     onMounted(fetchTables);
+
+    //AI gave me the idea to use watch to detect changes and updat information
     watch([selectedDate, selectedTime], fetchTables);
 
     watch([peopleCount, selectedPreference], () => {

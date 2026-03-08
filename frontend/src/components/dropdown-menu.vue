@@ -13,6 +13,8 @@
   </div>
 </template>
 
+<!--For dropdown-menu I used this link as guidance and inspiration. https://dev.to/mmmrks/building-a-vuejs-dropdown-menu-component-ho3-->
+
 <script setup>
 import { onMounted, ref } from "vue"
 const props = defineProps({
